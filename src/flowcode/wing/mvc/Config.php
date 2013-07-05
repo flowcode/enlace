@@ -9,35 +9,19 @@ namespace flowcode\wing\mvc;
  */
 class Config {
 
-    public static function get($section, $param) {
+    protected static $config = array();
 
-        // dev
-        $path = "common/config/setup.ini";
-
-        //$framework_base = '/var/www/inter/src/flowcode/';
-        $framework_base = dirname(__FILE__) . "/../../";
-
-        // levanto la configuracion de acuerdo al modo de inicio
-        // Parse with sections
-        $config = parse_ini_file($framework_base . $path, true);
-        if (isset($config[$section][$param])) {
-            return $config[$section][$param];
-        } else {
-            return NULL;
-        }
+    private function __construct() {
+        
     }
 
-    public static function getByModule($module, $section, $param) {
+    public static function set($key, $val) {
+        self::$config[$key] = $val;
+    }
 
-        $path = "$module/config/setup.ini";
-
-        $framework_base = dirname(__FILE__) . "/../../";
-
-        // levanto la configuracion de acuerdo al modo de inicio
-        // Parse with sections
-        $config = parse_ini_file($framework_base . $path, true);
-        if (isset($config[$section][$param])) {
-            return $config[$section][$param];
+    public static function get($key) {
+        if (isset(self::$config[$key])) {
+            return self::$config[$key];
         } else {
             return NULL;
         }

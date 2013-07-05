@@ -2,7 +2,6 @@
 
 namespace flowcode\wing\mvc;
 
-use flowcode\wing\config\Setup;
 use flowcode\wing\mvc\Controller;
 use flowcode\wing\mvc\HttpRequest;
 use flowcode\wing\mvc\HttpRequestBuilder;
@@ -10,11 +9,17 @@ use flowcode\wing\utils\KLogger;
 
 class Kernel {
 
-    public function __construct() {
-        
-    }
+    protected $configurationFiles;
+    protected $scanneableControllers;
+    protected $dirs;
+    protected $defaultController;
+    protected $defaultMethod;
+    protected $errorMethod;
+    protected $loginController;
+    protected $loginMethod;
+    protected $restrictedMethod;
 
-    public function init($mode) {
+    public function __construct($mode) {
         session_start();
 
         if ('prod' == $mode) {
@@ -22,13 +27,21 @@ class Kernel {
         }
     }
 
+    protected function setup() {
+        
+    }
+
+    private function loadConfig() {
+        foreach ($this->configurationFiles as $fileToLoad) {
+            require_once $fileToLoad;
+        }
+    }
+
     public function handleRequest($requestedUrl) {
+        $this->setup();
+        $this->loadConfig();
 
-        require_once (__DIR__ . '/Autoloader.php');
-
-        $setup = new Setup();
-        $controllersToScan = $setup->getScanneableControllers();
-
+        $controllersToScan = $this->getScanneableControllers();
         $request = $this->getRequest($requestedUrl);
 
         // scan controller
@@ -51,8 +64,8 @@ class Kernel {
             $controller->setName($request->getControllerName());
         } else {
 
-            $class = $setup->getDefaultController();
-            $request->setAction($setup->getDefaultMethod());
+            $class = $this->getDefaultController();
+            $request->setAction($this->getDefaultMethod());
             $controller = new $class();
         }
 
@@ -63,8 +76,8 @@ class Kernel {
 
                 // Si no esta atenticado, lo llevo a la pantalla de autenticacion.
                 $request = new HttpRequest("");
-                $request->setAction($setup->getLoginMethod());
-                $class = $setup->getLoginController();
+                $request->setAction($this->getLoginMethod());
+                $class = $this->getLoginController();
                 $controller = new $class();
                 $controller->setModule($moduleName);
             } else {
@@ -72,14 +85,13 @@ class Kernel {
                 // Si esta atenticado, verifico que tenga un rol valido para el controller.
                 if (!$controller->canAccess($_SESSION['user']['role'])) {
                     $request = new HttpRequest("");
-                    $request->setAction($setup->getRestrictedMethod());
+                    $request->setAction($this->getRestrictedMethod());
                     $request->setControllerName("usuario");
-                    $class = $setup->getLoginController();
+                    $class = $this->getLoginController();
                     $controller = new $class();
                 }
             }
         }
-
         $method = $request->getAction();
         $this->dispatch($controller, $method, $request);
     }
@@ -97,14 +109,11 @@ class Kernel {
     public function shutdown() {
         if (($error = error_get_last())) {
             ob_clean();
-            $setup = new Setup();
-
             /* log error */
-            KLogger::instance($setup->getLogDir())->logCrit($error["message"]);
-
+            KLogger::instance($this->getLogDir())->logCrit($error["message"]);
             $request = new HttpRequest();
-            $class = $setup->getDefaultController();
-            $method = $setup->getErrorMethod();
+            $class = $this->getDefaultController();
+            $method = $this->getErrorMethod();
             $controller = new $class();
             $this->dispatch($controller, $method, $request);
         }
@@ -112,7 +121,7 @@ class Kernel {
 
     private function validClass($classname) {
         $params = explode('\\', $classname);
-        $filename = __DIR__ . '/../../..';
+        $filename = $this->dirs["src"];
 
         $count = (count($params) - 1);
         for ($i = 1; $i <= $count; $i++) {
@@ -120,6 +129,83 @@ class Kernel {
         }
         $filename .= '.php';
         return file_exists($filename);
+    }
+
+    protected function getScanneableControllers() {
+        return $this->scanneableControllers;
+    }
+
+    protected function setScanneableControllers($scanneableControllers) {
+        $this->scanneableControllers = $scanneableControllers;
+    }
+
+    protected function getDefaultController() {
+        return $this->defaultController;
+    }
+
+    protected function getDefaultMethod() {
+        return $this->defaultMethod;
+    }
+
+    protected function getDirs() {
+        return $this->dirs;
+    }
+
+    protected function getLogDir() {
+        return $this->dirs["log"];
+    }
+
+    protected function setDirs($dirs) {
+        $this->dirs = $dirs;
+    }
+
+    protected function getLoginController() {
+        return $this->loginController;
+    }
+
+    protected function setLoginController($loginController) {
+        $this->loginController = $loginController;
+    }
+
+    protected function getLoginMethod() {
+        return $this->loginMethod;
+    }
+
+    protected function setLoginMethod($loginMethod) {
+        $this->loginMethod = $loginMethod;
+    }
+
+    protected function getRestrictedMethod() {
+        return $this->restrictedMethod;
+    }
+
+    protected function setRestrictedMethod($restrictedMethod) {
+        $this->restrictedMethod = $restrictedMethod;
+    }
+
+    protected function getErrorMethod() {
+        return $this->errorMethod;
+    }
+
+    protected function setErrorMethod($errorMethod) {
+        $this->errorMethod = $errorMethod;
+    }
+
+    public function getConfigurationFiles() {
+        return $this->configurationFiles;
+    }
+
+    public function setConfigurationFiles($configurationFiles) {
+        $this->configurationFiles = $configurationFiles;
+    }
+
+    /**
+     * Add configuration file to be load.
+     * File path must be from root.
+     * @param type $filePath
+     */
+    public function addConfigurationFile($filePath) {
+        $this->configurationFiles[] = $filePath;
     }
 
 }

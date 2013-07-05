@@ -17,12 +17,10 @@ class HttpRequestBuilder {
         $instance->setRequestedUrl($requestedUrl);
 
         $array = explode('/', $requestedUrl);
-
         // controller
         $controllerName = "home";
         if (!empty($array[1])) {
             $controllerName = $array[1];
-
             // primero intento buscar una ruta definida
             $routedController = Router::get(strtolower($array[1]), "controller");
             if ($routedController != NULL) {
