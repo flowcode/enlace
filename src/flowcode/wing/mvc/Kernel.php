@@ -2,10 +2,9 @@
 
 namespace flowcode\wing\mvc;
 
-use flowcode\wing\mvc\Controller;
-use flowcode\wing\mvc\HttpRequest;
-use flowcode\wing\mvc\HttpRequestBuilder;
-use flowcode\wing\utils\KLogger;
+use flowcode\wing\mvc\controller\Controller;
+use flowcode\wing\mvc\http\HttpRequest;
+use flowcode\wing\mvc\http\HttpRequestBuilder;
 
 class Kernel {
 
@@ -110,7 +109,7 @@ class Kernel {
         if (($error = error_get_last())) {
             ob_clean();
             /* log error */
-            KLogger::instance($this->getLogDir())->logCrit($error["message"]);
+            //KLogger::instance($this->getLogDir())->logCrit($error["message"]);
             $request = new HttpRequest();
             $class = $this->getDefaultController();
             $method = $this->getErrorMethod();
