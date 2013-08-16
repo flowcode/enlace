@@ -5,6 +5,8 @@ namespace flowcode\wing\mvc;
 use flowcode\wing\mvc\controller\Controller;
 use flowcode\wing\mvc\http\HttpRequest;
 use flowcode\wing\mvc\http\HttpRequestBuilder;
+use Monolog\Handler\StreamHandler;
+use Monolog\Logger;
 
 class Kernel {
 
@@ -17,11 +19,13 @@ class Kernel {
     protected $loginController;
     protected $loginMethod;
     protected $restrictedMethod;
+    protected $mode;
 
-    public function __construct($mode) {
+    public function __construct($mode = 'prod') {
         session_start();
+        $this->mode = $mode;
 
-        if ('prod' == $mode) {
+        if ('prod' == $this->mode) {
             register_shutdown_function(array($this, 'shutdown'));
         }
     }
@@ -109,7 +113,17 @@ class Kernel {
         if (($error = error_get_last())) {
             ob_clean();
             /* log error */
+            $log = new Logger('name');
+            $log->pushHandler(new StreamHandler($this->getLogDir(), Logger::WARNING));
             //KLogger::instance($this->getLogDir())->logCrit($error["message"]);
+            switch ($this->mode) {
+                case 'prod':
+                    $log->addError($error["message"]);
+                    break;
+                default:
+                    break;
+            }
+
             $request = new HttpRequest();
             $class = $this->getDefaultController();
             $method = $this->getErrorMethod();
