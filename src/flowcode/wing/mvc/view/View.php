@@ -1,7 +1,8 @@
 <?php
 
-namespace flowcode\wing\mvc;
+namespace flowcode\wing\mvc\view;
 
+use flowcode\wing\mvc\config\Config;
 use flowcode\wing\mvc\exception\ViewException;
 
 /**

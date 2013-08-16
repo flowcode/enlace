@@ -1,6 +1,6 @@
 <?php
 
-namespace flowcode\wing\mvc\domain;
+namespace flowcode\wing\mvc\view;
 
 /**
  *
