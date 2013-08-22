@@ -21,6 +21,11 @@ class Kernel {
     protected $restrictedMethod;
     protected $mode;
 
+    /**
+     * Default mode = 'prod'.
+     * Posible modes: 'prod', 'dev'
+     * @param type $mode
+     */
     public function __construct($mode = 'prod') {
         session_start();
         $this->mode = $mode;
@@ -40,6 +45,10 @@ class Kernel {
         }
     }
 
+    /**
+     * Handle the requested url dispatching to routed controllers.
+     * @param type $requestedUrl
+     */
     public function handleRequest($requestedUrl) {
         $this->setup();
         $this->loadConfig();
@@ -49,13 +58,13 @@ class Kernel {
 
         // scan controller
         $enabledController = FALSE;
-        $moduleName = null;
-        foreach ($controllersToScan as $module => $controllerNamespace) {
+        //$moduleName = null;
+        foreach ($controllersToScan as $appName => $controllerNamespace) {
             $class = $controllerNamespace . $request->getControllerClass();
 
             if ($this->validClass($class)) {
                 $enabledController = TRUE;
-                $moduleName = $module;
+                //$moduleName = $module;
                 break;
             }
         }
@@ -63,7 +72,7 @@ class Kernel {
 
         if ($enabledController) {
             $controller = new $class();
-            $controller->setModule($moduleName);
+            //$controller->setModule($moduleName);
             $controller->setName($request->getControllerName());
         } else {
 
@@ -82,7 +91,7 @@ class Kernel {
                 $request->setAction($this->getLoginMethod());
                 $class = $this->getLoginController();
                 $controller = new $class();
-                $controller->setModule($moduleName);
+                //$controller->setModule($moduleName);
             } else {
 
                 // Si esta atenticado, verifico que tenga un rol valido para el controller.
@@ -219,6 +228,15 @@ class Kernel {
      */
     public function addConfigurationFile($filePath) {
         $this->configurationFiles[] = $filePath;
+    }
+
+    /**
+     * Add a namespace to lookup.
+     * @param type $id
+     * @param type $namespace
+     */
+    public function addScanneableController($appName, $namespace) {
+        $this->scanneableControllers[$appName] = $namespace;
     }
 
 }
