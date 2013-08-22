@@ -261,8 +261,22 @@ class Kernel {
         }
         return $dirPath;
     }
-    
-    
+
+    public function setDefaultController($defaultController) {
+        $this->defaultController = $defaultController;
+    }
+
+    public function setDefaultMethod($defaultMethod) {
+        $this->defaultMethod = $defaultMethod;
+    }
+
+    public function setMode($mode) {
+        $this->mode = $mode;
+    }
+
+    public function getMode() {
+        return $this->mode;
+    }
 
 }
 
