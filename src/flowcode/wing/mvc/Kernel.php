@@ -239,6 +239,29 @@ class Kernel {
         $this->scanneableControllers[$appName] = $namespace;
     }
 
+    /**
+     * Add a dir with its name as a key.
+     * @param string $dirName
+     * @param string $path
+     */
+    public function addDir($dirName, $path) {
+        $this->dirs[$dirName] = $path;
+    }
+
+    /**
+     * Get the configured path for dirName.
+     * Return null if is not configured.
+     * @param type $dirName
+     * @return type string
+     */
+    public function getDirPath($dirName) {
+        $dirPath = null;
+        if (isset($this->dirs[$dirName])) {
+            $dirPath = $this->dirs[$dirName];
+        }
+        return $dirPath;
+    }
+
 }
 
 ?>
