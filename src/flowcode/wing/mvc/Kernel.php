@@ -10,16 +10,16 @@ use Monolog\Logger;
 
 class Kernel {
 
-    protected $configurationFiles;
-    protected $scanneableControllers;
-    protected $dirs;
-    protected $defaultController;
-    protected $defaultMethod;
-    protected $errorMethod;
-    protected $loginController;
-    protected $loginMethod;
-    protected $restrictedMethod;
-    protected $mode;
+    private $configurationFiles;
+    private $scanneableControllers;
+    private $dirs;
+    private $defaultController;
+    private $defaultMethod;
+    private $errorMethod;
+    private $loginController;
+    private $loginMethod;
+    private $restrictedMethod;
+    private $mode;
 
     /**
      * Default mode = 'prod'.
@@ -27,7 +27,7 @@ class Kernel {
      * @param type $mode
      */
     public function __construct($mode = 'prod') {
-        session_start();
+        //session_start();
         $this->mode = $mode;
 
         if ('prod' == $this->mode) {
@@ -153,63 +153,63 @@ class Kernel {
         return file_exists($filename);
     }
 
-    protected function getScanneableControllers() {
+    public function getScanneableControllers() {
         return $this->scanneableControllers;
     }
 
-    protected function setScanneableControllers($scanneableControllers) {
+    public function setScanneableControllers($scanneableControllers) {
         $this->scanneableControllers = $scanneableControllers;
     }
 
-    protected function getDefaultController() {
+    public function getDefaultController() {
         return $this->defaultController;
     }
 
-    protected function getDefaultMethod() {
+    public function getDefaultMethod() {
         return $this->defaultMethod;
     }
 
-    protected function getDirs() {
+    public function getDirs() {
         return $this->dirs;
     }
 
-    protected function getLogDir() {
+    public function getLogDir() {
         return $this->dirs["log"];
     }
 
-    protected function setDirs($dirs) {
+    public function setDirs($dirs) {
         $this->dirs = $dirs;
     }
 
-    protected function getLoginController() {
+    public function getLoginController() {
         return $this->loginController;
     }
 
-    protected function setLoginController($loginController) {
+    public function setLoginController($loginController) {
         $this->loginController = $loginController;
     }
 
-    protected function getLoginMethod() {
+    public function getLoginMethod() {
         return $this->loginMethod;
     }
 
-    protected function setLoginMethod($loginMethod) {
+    public function setLoginMethod($loginMethod) {
         $this->loginMethod = $loginMethod;
     }
 
-    protected function getRestrictedMethod() {
+    public function getRestrictedMethod() {
         return $this->restrictedMethod;
     }
 
-    protected function setRestrictedMethod($restrictedMethod) {
+    public function setRestrictedMethod($restrictedMethod) {
         $this->restrictedMethod = $restrictedMethod;
     }
 
-    protected function getErrorMethod() {
+    public function getErrorMethod() {
         return $this->errorMethod;
     }
 
-    protected function setErrorMethod($errorMethod) {
+    public function setErrorMethod($errorMethod) {
         $this->errorMethod = $errorMethod;
     }
 
@@ -261,6 +261,8 @@ class Kernel {
         }
         return $dirPath;
     }
+    
+    
 
 }
 
