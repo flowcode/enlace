@@ -3,11 +3,12 @@
 namespace flowcode\wing\mvc\controller;
 
 /**
- * Description of Action
+ * BaseController with base functionality for WingMVC.
+ * It's recommended to extend your app controllers from this one.
  *
  * @author juanma
  */
-class Controller {
+class BaseController implements IController {
 
     public $isSecure = true;
     protected $module;
@@ -26,18 +27,35 @@ class Controller {
         $this->isSecure = $isSecure;
     }
 
+    /**
+     * Force synchronized redirect.
+     * @param type $to_url
+     */
     public function redirect($to_url) {
         header("Location: $to_url");
     }
 
+    /**
+     * Return true if the controller is setted to be secured.
+     * @return bool secured.
+     */
     public function isSecure() {
         return $this->isSecure;
     }
 
+    /**
+     * Add a role to the available roles.
+     * @param string $role
+     */
     public function addAllowedRole($role) {
         $this->roles[] = $role;
     }
 
+    /**
+     * Check if a the role is in the controller available accesing roles.
+     * @param type $role
+     * @return boolean
+     */
     public function canAccess($role) {
         $can = false;
         foreach ($this->roles as $activeRole) {

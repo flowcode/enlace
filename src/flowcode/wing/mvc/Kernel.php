@@ -2,7 +2,7 @@
 
 namespace flowcode\wing\mvc;
 
-use flowcode\wing\mvc\controller\Controller;
+use flowcode\wing\mvc\controller\IController;
 use flowcode\wing\mvc\http\HttpRequest;
 use flowcode\wing\mvc\http\HttpRequestBuilder;
 use Monolog\Handler\StreamHandler;
@@ -10,9 +10,9 @@ use Monolog\Logger;
 
 class Kernel {
 
-    private $configurationFiles;
-    private $scanneableControllers;
-    private $dirs;
+    private $configurationFiles = array();
+    private $scanneableControllers = array();
+    private $dirs = array();
     private $defaultController;
     private $defaultMethod;
     private $errorMethod;
@@ -20,19 +20,24 @@ class Kernel {
     private $loginMethod;
     private $restrictedMethod;
     private $mode;
+    public static $MODE_PRODUCTION = 0;
+    public static $MODE_DEVELOPMENT = 1;
+    public static $MODE_TESTING = 2;
 
     /**
-     * Default mode = 'prod'.
-     * Posible modes: 'prod', 'dev'
-     * @param type $mode
+     * Default mode = 'production'.
+     * @param int $mode
      */
-    public function __construct($mode = 'prod') {
-        //session_start();
-        $this->mode = $mode;
+    public function __construct($mode = null) {
 
-        if ('prod' == $this->mode) {
-            register_shutdown_function(array($this, 'shutdown'));
+        if (!is_null($mode)) {
+            $this->mode = $mode;
+        } else {
+            $this->mode = self::$MODE_PRODUCTION;
         }
+        $this->defaultController = "\\flowcode\\wing\\mvc\\controller\\DefaultController";
+        $this->defaultMethod = "defaultMethod";
+        register_shutdown_function(array($this, 'shutdown'));
     }
 
     protected function setup() {
@@ -54,21 +59,19 @@ class Kernel {
         $this->loadConfig();
 
         $controllersToScan = $this->getScanneableControllers();
-        $request = $this->getRequest($requestedUrl);
+        $request = HttpRequestBuilder::buildFromRequestUrl($requestedUrl);
 
         // scan controller
         $enabledController = FALSE;
         //$moduleName = null;
         foreach ($controllersToScan as $appName => $controllerNamespace) {
             $class = $controllerNamespace . $request->getControllerClass();
-
             if ($this->validClass($class)) {
                 $enabledController = TRUE;
                 //$moduleName = $module;
                 break;
             }
         }
-
 
         if ($enabledController) {
             $controller = new $class();
@@ -108,42 +111,82 @@ class Kernel {
         $this->dispatch($controller, $method, $request);
     }
 
-    private function dispatch(Controller $controller, $method, HttpRequest $request) {
+    private function dispatch(IController $controller, $method, HttpRequest $request) {
         $view = $controller->$method($request);
         $view->render();
     }
 
-    public function getRequest($requestedUrl) {
-        $request = HttpRequestBuilder::buildFromRequestUrl($requestedUrl);
-        return $request;
-    }
-
+    /**
+     * Function for show errors based on kernel mode.
+     */
     public function shutdown() {
         if (($error = error_get_last())) {
             ob_clean();
             /* log error */
-            $log = new Logger('name');
-            $log->pushHandler(new StreamHandler($this->getLogDir(), Logger::WARNING));
-            //KLogger::instance($this->getLogDir())->logCrit($error["message"]);
+            $msg = $error["message"] . " in file: " . $error["file"] . " on line: " . $error["line"];
+            $log = new Logger('kernel');
+            $file = $this->getLogDir() . "/log-" . date("Ymd") . ".txt";
+            $log->pushHandler(new StreamHandler($file, Logger::ERROR));
             switch ($this->mode) {
                 case 'prod':
-                    $log->addError($error["message"]);
+                    $log->addError($msg);
+                    $request = new HttpRequest();
+                    $class = $this->getDefaultController();
+                    $method = $this->getErrorMethod();
+                    $controller = new $class();
+                    $this->dispatch($controller, $method, $request);
                     break;
                 default:
+                    die($msg);
                     break;
             }
-
-            $request = new HttpRequest();
-            $class = $this->getDefaultController();
-            $method = $this->getErrorMethod();
-            $controller = new $class();
-            $this->dispatch($controller, $method, $request);
         }
+    }
+
+    /**
+     * Add configuration file to be load.
+     * File path must be from root.
+     * @param type $filePath
+     */
+    public function addConfigurationFile($filePath) {
+        $this->configurationFiles[] = $filePath;
+    }
+
+    /**
+     * Add a namespace to lookup.
+     * @param type $id
+     * @param type $namespace
+     */
+    public function addScanneableController($appName, $namespace) {
+        $this->scanneableControllers[$appName] = $namespace;
+    }
+
+    /**
+     * Add a dir with its name as a key.
+     * @param string $dirName
+     * @param string $path
+     */
+    public function addDir($dirName, $path) {
+        $this->dirs[$dirName] = $path;
+    }
+
+    /**
+     * Get the configured path for dirName.
+     * Return null if is not configured.
+     * @param type $dirName
+     * @return type string
+     */
+    public function getDirPath($dirName) {
+        $dirPath = null;
+        if (isset($this->dirs[$dirName])) {
+            $dirPath = $this->dirs[$dirName];
+        }
+        return $dirPath;
     }
 
     private function validClass($classname) {
         $params = explode('\\', $classname);
-        $filename = $this->dirs["src"];
+        $filename = $this->getDirPath("src");
 
         $count = (count($params) - 1);
         for ($i = 1; $i <= $count; $i++) {
@@ -219,47 +262,6 @@ class Kernel {
 
     public function setConfigurationFiles($configurationFiles) {
         $this->configurationFiles = $configurationFiles;
-    }
-
-    /**
-     * Add configuration file to be load.
-     * File path must be from root.
-     * @param type $filePath
-     */
-    public function addConfigurationFile($filePath) {
-        $this->configurationFiles[] = $filePath;
-    }
-
-    /**
-     * Add a namespace to lookup.
-     * @param type $id
-     * @param type $namespace
-     */
-    public function addScanneableController($appName, $namespace) {
-        $this->scanneableControllers[$appName] = $namespace;
-    }
-
-    /**
-     * Add a dir with its name as a key.
-     * @param string $dirName
-     * @param string $path
-     */
-    public function addDir($dirName, $path) {
-        $this->dirs[$dirName] = $path;
-    }
-
-    /**
-     * Get the configured path for dirName.
-     * Return null if is not configured.
-     * @param type $dirName
-     * @return type string
-     */
-    public function getDirPath($dirName) {
-        $dirPath = null;
-        if (isset($this->dirs[$dirName])) {
-            $dirPath = $this->dirs[$dirName];
-        }
-        return $dirPath;
     }
 
     public function setDefaultController($defaultController) {

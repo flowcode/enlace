@@ -1,16 +1,15 @@
 <?php
 
-namespace flowcode\wing\controller;
+namespace flowcode\wing\mvc\controller;
 
-use flowcode\wing\mvc\domain\Controller;
-use flowcode\wing\mvc\View;
+use flowcode\wing\mvc\view\PlainView;
 
 /**
  * Description of DefaultController
  *
  * @author juanma
  */
-class DefaultController extends Controller {
+class DefaultController extends BaseController{
 
     function __construct() {
         $this->setIsSecure(false);
@@ -18,14 +17,9 @@ class DefaultController extends Controller {
         $this->setModule("wing");
     }
 
-    public function hello() {
-        $viewData["data"] = "wing hello!";
-        return View::getPlainView($this, "wing/view/page/data-page", $viewData);
-    }
-
-    public function error() {
-        $viewData['data'] = "";
-        return View::getViewWithSpecificMaster($this, "wing/view/page/error-page", $viewData, "wing/view/master-static");
+    public function defaultMethod() {
+        $viewData["data"] = "Default controller, default method. We strongly recommend to setup your own default controller.";
+        return new PlainView($viewData);
     }
 
 }

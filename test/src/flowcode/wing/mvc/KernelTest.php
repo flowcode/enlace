@@ -18,6 +18,8 @@ class KernelTest extends \PHPUnit_Framework_TestCase {
      */
     protected function setUp() {
         $this->object = new Kernel();
+        $this->object->setMode(Kernel::$MODE_TESTING);
+        $this->object->addDir("src", __DIR__ . "/../src");
     }
 
     /**
@@ -32,19 +34,13 @@ class KernelTest extends \PHPUnit_Framework_TestCase {
      * @covers flowcode\wing\mvc\Kernel::handleRequest
      * @todo   Implement testHandleRequest().
      */
-    public function testHandleRequest() {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-                'This test has not been implemented yet.'
-        );
+    public function testHandleRequest_defaultControllerDefaultMethod() {
+        $requestedUrl = "/home";
+        $this->object->handleRequest($requestedUrl);
+        $this->expectOutputString('Default controller, default method. We strongly recommend to setup your own default controller.');
     }
 
-    /**
-     * @covers flowcode\wing\mvc\Kernel::getRequest
-     * @todo   Implement testGetRequest().
-     */
-    public function testGetRequest() {
-        // Remove the following lines when you implement this test.
+    public function testHandleRequest_withTestController() {
         $this->markTestIncomplete(
                 'This test has not been implemented yet.'
         );

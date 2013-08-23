@@ -1,9 +1,7 @@
 <?php
 
-namespace flowcode\wing\mvc;
+namespace flowcode\wing\mvc\view;
 
-use flowcode\wing\mvc\Controller;
-use flowcode\wing\mvc\IView;
 
 /**
  * Description of View
@@ -13,7 +11,6 @@ use flowcode\wing\mvc\IView;
 class PlainView implements IView {
 
     protected $viewData;
-
 
     function __construct($viewData) {
         $this->viewData = $viewData;
