@@ -47,7 +47,7 @@ class View implements IView {
         }
 
         if (!is_null($settedMaster)) {
-            $masterfile = $viewRootPath . $hierarchy[0] . "/" . $settedMaster . ".view.php";
+            $masterfile = $viewRootPath . "/" . $hierarchy[0] . "/" . $settedMaster . ".view.php";
             if (file_exists($masterfile)) {
                 require_once $masterfile;
             } else {
