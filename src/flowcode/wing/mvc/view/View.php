@@ -61,13 +61,8 @@ class View implements IView {
             }
         }
 
-        /* content cleaning */
-        $htmlPurifierConfig = HTMLPurifier_Config::createDefault();
-        $purifier = new HTMLPurifier($htmlPurifierConfig);
-        $cleanContent = $purifier->purify($content);
-
-        /* render clean content */
-        echo $cleanContent;
+        /* render content */
+        echo $content;
     }
 
     public function getViewData() {

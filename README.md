@@ -1,4 +1,4 @@
-Wing MVC module
+Wing MVC
 ======
 
-Wing, Light PHP Framework
+MVC PHP Microframework
