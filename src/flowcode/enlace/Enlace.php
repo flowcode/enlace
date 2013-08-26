@@ -2,6 +2,12 @@
 
 namespace flowcode\enlace;
 
+use flowcode\enlace\controller\IController;
+use flowcode\enlace\http\HttpRequest;
+use flowcode\enlace\http\HttpRequestBuilder;
+use Monolog\Handler\StreamHandler;
+use Monolog\Logger;
+
 class Enlace {
 
     private $configurationFiles = array();
@@ -29,7 +35,7 @@ class Enlace {
         } else {
             $this->mode = self::$MODE_PRODUCTION;
         }
-        $this->defaultController = "\\flowcode\\wing\\mvc\\controller\\DefaultController";
+        $this->defaultController = "\\flowcode\\enlace\\controller\\DefaultController";
         $this->defaultMethod = "defaultMethod";
         register_shutdown_function(array($this, 'shutdown'));
     }

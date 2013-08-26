@@ -5,7 +5,7 @@
         {
             "name": "Juan Manuel Agüero",
             "email": "jaguero@flowcode.com.ar"
-        },
+        }
     ],
     "require": {
         "php": ">=5.3.0",
