@@ -1,11 +1,10 @@
 <?php
 
-namespace flowcode\wing\mvc\view;
+namespace flowcode\enlace\view;
 
-use flowcode\wing\mvc\config\Config;
-use flowcode\wing\mvc\exception\ViewException;
-use HTMLPurifier;
-use HTMLPurifier_Config;
+use flowcode\enlace\config\Config;
+use flowcode\enlace\exception\ViewException;
+use flowcode\enlace\view\IView;
 
 /**
  * Description of View
@@ -30,13 +29,12 @@ class View implements IView {
         /* set view data available */
         $viewData = $this->viewData;
 
-        $content = "";
         /* with master */
         $viewfile = $viewRootPath . "/" . $this->getViewName() . ".view.php";
         if (file_exists($viewfile)) {
             ob_start();
             require_once $viewfile;
-            $content .= ob_get_contents();
+            $content = ob_get_contents();
             ob_end_clean();
         } else {
             throw new ViewException($viewfile);
@@ -52,17 +50,13 @@ class View implements IView {
         if (!is_null($settedLayout)) {
             $layoutFile = $viewRootPath . "/" . $hierarchy[0] . "/" . $settedLayout . ".view.php";
             if (file_exists($layoutFile)) {
-                ob_start();
                 require_once $layoutFile;
-                $content .= ob_get_contents();
-                ob_end_clean();
             } else {
                 throw new ViewException($settedLayout);
             }
+        } else {
+            echo $content;
         }
-
-        /* render content */
-        echo $content;
     }
 
     public function getViewData() {

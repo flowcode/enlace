@@ -1,6 +1,6 @@
 <?php
 
-namespace flowcode\wing\mvc\controller;
+namespace flowcode\enlace\controller;
 
 /**
  * Controller Interface.

@@ -1,13 +1,13 @@
 <?php
 
-namespace flowcode\wing\mvc\config;
+namespace flowcode\enlace\config;
 
 /**
- * Description of Config
+ * Description of EnlaceConfig
  *
  * @author juanma
  */
-class Config {
+class EnlaceConfig {
 
     protected static $config = array();
 

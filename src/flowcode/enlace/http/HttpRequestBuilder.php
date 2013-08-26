@@ -1,8 +1,8 @@
 <?php
 
-namespace flowcode\wing\mvc\http;
+namespace flowcode\enlace\http;
 
-use flowcode\wing\mvc\config\Router;
+use flowcode\enlace\config\Router;
 
 
 

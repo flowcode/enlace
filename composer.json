@@ -1,11 +1,11 @@
 {
-    "name": "flowcode/wing-mvc",
+    "name": "flowcode/enlace",
     "description": "PHP MVC Microframework",
     "authors": [
         {
             "name": "Juan Manuel Agüero",
             "email": "jaguero@flowcode.com.ar"
-        }
+        },
     ],
     "require": {
         "php": ">=5.3.0",

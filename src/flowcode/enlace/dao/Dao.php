@@ -1,10 +1,10 @@
 <?php
 
-namespace flowcode\wing\mvc;
+namespace flowcode\enlace;
 
 use Exception;
-use flowcode\wing\mvc\Config;
-use flowcode\wing\mvc\exception\DaoException;
+use flowcode\enlace\Config;
+use flowcode\enlace\exception\DaoException;
 
 /**
  * Description of Dao

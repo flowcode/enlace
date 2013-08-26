@@ -1,6 +1,6 @@
 <?php
 
-namespace flowcode\wing\mvc\http;
+namespace flowcode\enlace\http;
 
 /**
  * 

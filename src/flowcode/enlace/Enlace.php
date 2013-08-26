@@ -1,14 +1,8 @@
 <?php
 
-namespace flowcode\wing\mvc;
+namespace flowcode\enlace;
 
-use flowcode\wing\mvc\controller\IController;
-use flowcode\wing\mvc\http\HttpRequest;
-use flowcode\wing\mvc\http\HttpRequestBuilder;
-use Monolog\Handler\StreamHandler;
-use Monolog\Logger;
-
-class Kernel {
+class Enlace {
 
     private $configurationFiles = array();
     private $scanneableControllers = array();

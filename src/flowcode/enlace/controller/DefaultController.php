@@ -1,8 +1,8 @@
 <?php
 
-namespace flowcode\wing\mvc\controller;
+namespace flowcode\enlace\controller;
 
-use flowcode\wing\mvc\view\PlainView;
+use flowcode\enlace\view\PlainView;
 
 /**
  * Description of DefaultController

@@ -1,6 +1,6 @@
 <?php
 
-namespace flowcode\wing\mvc\exception;
+namespace flowcode\enlace\exception;
 
 use Exception;
 

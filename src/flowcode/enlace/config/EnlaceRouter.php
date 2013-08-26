@@ -1,13 +1,13 @@
 <?php
 
-namespace flowcode\wing\mvc\config;
+namespace flowcode\enlace\config;
 
 /**
- * Description of Router.
+ * Description of EnlaceRouter.
  *
  * @author juanma
  */
-class Router {
+class EnlaceRouter {
 
     protected static $routes = array();
 

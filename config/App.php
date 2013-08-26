@@ -2,7 +2,7 @@
 
 namespace flowcode\common;
 
-use flowcode\wing\mvc\Kernel;
+use flowcode\enlace\Kernel;
 
 /**
  * Description of AppKernel
