@@ -2,7 +2,7 @@
 
 namespace flowcode\enlace\http;
 
-use flowcode\enlace\config\EnlaceRouter;
+use flowcode\enlace\Enlace;
 
 /**
  * Description of HttpRequestBuilder
@@ -21,7 +21,7 @@ class HttpRequestBuilder {
         if (!empty($array[1])) {
             $controllerName = $array[1];
             // primero intento buscar una ruta definida
-            $routedController = EnlaceRouter::get(strtolower($array[1]), "controller");
+            $routedController = Enlace::get(strtolower($array[1]), "controller");
             if ($routedController != NULL) {
                 $controllerName = $routedController;
             }
@@ -34,7 +34,7 @@ class HttpRequestBuilder {
         if (!empty($array[2])) {
             $actionName = $array[2];
             // primero intento buscar una ruta definida
-            $actions = EnlaceRouter::get(strtolower($array[1]), "actions");
+            $actions = Enlace::get(strtolower($array[1]), "actions");
             if ($actions != NULL && isset($actions[$actionName])) {
                 $actionName = $actions[$actionName];
             } elseif (isset($actions["*"])) {
@@ -43,7 +43,7 @@ class HttpRequestBuilder {
         } else {
 
             if (isset($array[1])) {
-                $actions = EnlaceRouter::get(strtolower($array[1]), "actions");
+                $actions = Enlace::get(strtolower($array[1]), "actions");
                 if ($actions != NULL) {
                     $actionName = (isset($actions["default"])) ? $actions["default"] : "index";
                 }
