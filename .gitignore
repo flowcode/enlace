@@ -1,6 +1,5 @@
 /nbproject/private/
 
-phpunit.xml
 composer.lock
 composer.phar
 autoload.php
