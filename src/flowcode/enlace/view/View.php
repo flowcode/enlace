@@ -2,7 +2,7 @@
 
 namespace flowcode\enlace\view;
 
-use flowcode\enlace\config\Config;
+use flowcode\enlace\Enlace;
 use flowcode\enlace\exception\ViewException;
 use flowcode\enlace\view\IView;
 
@@ -22,7 +22,7 @@ class View implements IView {
     }
 
     public function render() {
-        $viewConfig = Config::get("view");
+        $viewConfig = Enlace::get("view");
         $viewRootPath = $viewConfig["path"];
         $settedLayout = null;
 

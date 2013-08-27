@@ -10,15 +10,8 @@ use Monolog\Logger;
 
 class Enlace {
 
-    private $configurationFiles = array();
-    private $scanneableControllers = array();
-    private $dirs = array();
-    private $defaultController;
-    private $defaultMethod;
-    private $errorMethod;
-    private $loginController;
-    private $loginMethod;
-    private $restrictedMethod;
+    protected static $config = array();
+    protected static $routes = array();
     private $mode;
     public static $MODE_PRODUCTION = 0;
     public static $MODE_DEVELOPMENT = 1;
@@ -35,19 +28,9 @@ class Enlace {
         } else {
             $this->mode = self::$MODE_PRODUCTION;
         }
-        $this->defaultController = "\\flowcode\\enlace\\controller\\DefaultController";
-        $this->defaultMethod = "defaultMethod";
+//        $this->defaultController = "\\flowcode\\enlace\\controller\\DefaultController";
+//        $this->defaultMethod = "defaultMethod";
         register_shutdown_function(array($this, 'shutdown'));
-    }
-
-    protected function setup() {
-        
-    }
-
-    private function loadConfig() {
-        foreach ($this->configurationFiles as $fileToLoad) {
-            require_once $fileToLoad;
-        }
     }
 
     /**
@@ -55,53 +38,47 @@ class Enlace {
      * @param type $requestedUrl
      */
     public function handleRequest($requestedUrl) {
-        $this->setup();
-        $this->loadConfig();
 
-        $controllersToScan = $this->getScanneableControllers();
+        $controllersToScan = self::$config["scanneableControllers"];
         $request = HttpRequestBuilder::buildFromRequestUrl($requestedUrl);
 
         // scan controller
         $enabledController = FALSE;
-        //$moduleName = null;
         foreach ($controllersToScan as $appName => $controllerNamespace) {
             $class = $controllerNamespace . $request->getControllerClass();
             if ($this->validClass($class)) {
                 $enabledController = TRUE;
-                //$moduleName = $module;
                 break;
             }
         }
 
         if ($enabledController) {
             $controller = new $class();
-            //$controller->setModule($moduleName);
             $controller->setName($request->getControllerName());
         } else {
 
-            $class = $this->getDefaultController();
-            $request->setAction($this->getDefaultMethod());
+            $class = self::get("defaultController");
+            $request->setAction(self::get("defaultMethod"));
             $controller = new $class();
         }
 
-        // seguridad a nivel controller
+        // controller security
         if ($controller->isSecure()) {
 
             if (!isset($_SESSION['user']['username'])) {
 
-                // Si no esta atenticado, lo llevo a la pantalla de autenticacion.
+                // not authenticated
                 $request = new HttpRequest("");
-                $request->setAction($this->getLoginMethod());
-                $class = $this->getLoginController();
+                $request->setAction(self::get("loginMethod"));
+                $class = self::get("loginController");
                 $controller = new $class();
-                //$controller->setModule($moduleName);
             } else {
 
-                // Si esta atenticado, verifico que tenga un rol valido para el controller.
+                // authenticated
                 if (!$controller->canAccess($_SESSION['user']['role'])) {
                     $request = new HttpRequest("");
                     $request->setAction($this->getRestrictedMethod());
-                    $request->setControllerName("usuario");
+                    $request->setControllerName("user");
                     $class = $this->getLoginController();
                     $controller = new $class();
                 }
@@ -125,68 +102,31 @@ class Enlace {
             /* log error */
             $msg = $error["message"] . " in file: " . $error["file"] . " on line: " . $error["line"];
             $log = new Logger('kernel');
-            $file = $this->getLogDir() . "/log-" . date("Ymd") . ".txt";
+            $file = self::get("dir", "log") . "/log-" . date("Ymd") . ".txt";
             $log->pushHandler(new StreamHandler($file, Logger::ERROR));
             switch ($this->mode) {
-                case 'prod':
+                case self::$MODE_DEVELOPMENT:
                     $log->addError($msg);
                     $request = new HttpRequest();
-                    $class = $this->getDefaultController();
-                    $method = $this->getErrorMethod();
+                    $class = self::get("defaultController");
+                    $method = self::get("errorMethod");
                     $controller = new $class();
                     $this->dispatch($controller, $method, $request);
                     break;
-                default:
+                case self::$MODE_DEVELOPMENT:
                     die($msg);
+                    break;
+
+                default:
+                    echo $msg;
                     break;
             }
         }
     }
 
-    /**
-     * Add configuration file to be load.
-     * File path must be from root.
-     * @param type $filePath
-     */
-    public function addConfigurationFile($filePath) {
-        $this->configurationFiles[] = $filePath;
-    }
-
-    /**
-     * Add a namespace to lookup.
-     * @param type $id
-     * @param type $namespace
-     */
-    public function addScanneableController($appName, $namespace) {
-        $this->scanneableControllers[$appName] = $namespace;
-    }
-
-    /**
-     * Add a dir with its name as a key.
-     * @param string $dirName
-     * @param string $path
-     */
-    public function addDir($dirName, $path) {
-        $this->dirs[$dirName] = $path;
-    }
-
-    /**
-     * Get the configured path for dirName.
-     * Return null if is not configured.
-     * @param type $dirName
-     * @return type string
-     */
-    public function getDirPath($dirName) {
-        $dirPath = null;
-        if (isset($this->dirs[$dirName])) {
-            $dirPath = $this->dirs[$dirName];
-        }
-        return $dirPath;
-    }
-
     private function validClass($classname) {
         $params = explode('\\', $classname);
-        $filename = $this->getDirPath("src");
+        $filename = self::get("dir", "src");
 
         $count = (count($params) - 1);
         for ($i = 1; $i <= $count; $i++) {
@@ -196,80 +136,36 @@ class Enlace {
         return file_exists($filename);
     }
 
-    public function getScanneableControllers() {
-        return $this->scanneableControllers;
+    public static function setRoute($key, $val) {
+        self::$routes[$key] = $val;
     }
 
-    public function setScanneableControllers($scanneableControllers) {
-        $this->scanneableControllers = $scanneableControllers;
+    public static function getRoute($key, $param) {
+        if (isset(self::$routes[$key][$param])) {
+            return self::$routes[$key][$param];
+        } else {
+            return NULL;
+        }
     }
 
-    public function getDefaultController() {
-        return $this->defaultController;
+    public static function set($key, $val) {
+        self::$config[$key] = $val;
     }
 
-    public function getDefaultMethod() {
-        return $this->defaultMethod;
-    }
-
-    public function getDirs() {
-        return $this->dirs;
-    }
-
-    public function getLogDir() {
-        return $this->dirs["log"];
-    }
-
-    public function setDirs($dirs) {
-        $this->dirs = $dirs;
-    }
-
-    public function getLoginController() {
-        return $this->loginController;
-    }
-
-    public function setLoginController($loginController) {
-        $this->loginController = $loginController;
-    }
-
-    public function getLoginMethod() {
-        return $this->loginMethod;
-    }
-
-    public function setLoginMethod($loginMethod) {
-        $this->loginMethod = $loginMethod;
-    }
-
-    public function getRestrictedMethod() {
-        return $this->restrictedMethod;
-    }
-
-    public function setRestrictedMethod($restrictedMethod) {
-        $this->restrictedMethod = $restrictedMethod;
-    }
-
-    public function getErrorMethod() {
-        return $this->errorMethod;
-    }
-
-    public function setErrorMethod($errorMethod) {
-        $this->errorMethod = $errorMethod;
-    }
-
-    public function getConfigurationFiles() {
-        return $this->configurationFiles;
-    }
-
-    public function setConfigurationFiles($configurationFiles) {
-        $this->configurationFiles = $configurationFiles;
-    }
-
-    public function setDefaultController($defaultController) {
-        $this->defaultController = $defaultController;
-    }
-
-    public function setDefaultMethod($defaultMethod) {
-        $this->defaultMethod = $defaultMethod;
+    public static function get($key1, $key2 = null, $key3 = null) {
+        if (isset(self::$config[$key1])) {
+            if (!is_null($key2) && isset(self::$config[$key1][$key2])) {
+                if (!is_null($key3) && isset(self::$config[$key1][$key2][$key3])) {
+                    return self::$config[$key1][$key2][$key3];
+                } else {
+                    return self::$config[$key1][$key2];
+                }
+            } else {
+                return self::$config[$key1];
+            }
+        } else {
+            return null;
+        }
     }
 
     public function setMode($mode) {

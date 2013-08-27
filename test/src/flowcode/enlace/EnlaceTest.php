@@ -19,7 +19,14 @@ class EnlaceTest extends \PHPUnit_Framework_TestCase {
     protected function setUp() {
         $this->object = new Enlace();
         $this->object->setMode(Enlace::$MODE_TESTING);
-        $this->object->addDir("src", __DIR__ . "/../src");
+        $this->object->set("src", array(
+            "src" => __DIR__ . "/../src",
+            "log" => __DIR__ . "/../log"
+        ));
+        $this->object->set("scanneableControllers", array("enlace" => __DIR__ . "/../src"));
+        $this->object->set("defaultController", "\\flowcode\\enlace\\controller\\DefaultController");
+        $this->object->set("defaultMethod", "defaultMethod");
+        $this->object->set("errorMethod", "errorMethod");
     }
 
     /**
@@ -45,39 +52,6 @@ class EnlaceTest extends \PHPUnit_Framework_TestCase {
      * @todo   Implement testShutdown().
      */
     public function testShutdown() {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-                'This test has not been implemented yet.'
-        );
-    }
-
-    /**
-     * @covers flowcode\enlace\Enlace::addConfigurationFile
-     * @todo   Implement testAddConfigurationFile().
-     */
-    public function testAddConfigurationFile() {
-        $before = count($this->object->getConfigurationFiles());
-        $this->object->addConfigurationFile("/log");
-        $after = count($this->object->getConfigurationFiles());
-        $this->assertEquals($before + 1, $after);
-    }
-
-    /**
-     * @covers flowcode\enlace\Enlace::addScanneableController
-     * @todo   Implement testAddScanneableController().
-     */
-    public function testAddScanneableController() {
-        // Remove the following lines when you implement this test.
-        $this->markTestIncomplete(
-                'This test has not been implemented yet.'
-        );
-    }
-
-    /**
-     * @covers flowcode\enlace\Enlace::addDir
-     * @todo   Implement testAddDir().
-     */
-    public function testAddDir() {
         // Remove the following lines when you implement this test.
         $this->markTestIncomplete(
                 'This test has not been implemented yet.'
