@@ -1,6 +1,7 @@
 {
     "name": "flowcode/enlace",
     "description": "PHP MVC Microframework",
+    "license": "MIT",
     "authors": [
         {
             "name": "Juan Manuel Agüero",
