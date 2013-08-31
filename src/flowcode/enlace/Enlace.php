@@ -28,8 +28,6 @@ class Enlace {
         } else {
             $this->mode = self::$MODE_PRODUCTION;
         }
-//        $this->defaultController = "\\flowcode\\enlace\\controller\\DefaultController";
-//        $this->defaultMethod = "defaultMethod";
         register_shutdown_function(array($this, 'shutdown'));
     }
 
