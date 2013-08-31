@@ -105,7 +105,7 @@ class Enlace {
             $file = self::get("dir", "log") . "/log-" . date("Ymd") . ".txt";
             $log->pushHandler(new StreamHandler($file, Logger::ERROR));
             switch ($this->mode) {
-                case self::$MODE_DEVELOPMENT:
+                case self::$MODE_PRODUCTION:
                     $log->addError($msg);
                     $request = new HttpRequest();
                     $class = self::get("defaultController");
