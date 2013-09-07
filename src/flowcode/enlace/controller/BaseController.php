@@ -15,13 +15,10 @@ class BaseController implements IController {
     protected $name;
 
     /**
-     * Roles disponibles en la aplicacion
-     *  por defecto estan los siguientes roles:
-     *  -admin
-     *  -user
+     * Permissions that are allowed to access to this controller instance.
      * @var type 
      */
-    public $roles = array();
+    protected $permissions = array();
 
     public function setIsSecure($isSecure) {
         $this->isSecure = $isSecure;
@@ -44,72 +41,29 @@ class BaseController implements IController {
     }
 
     /**
-     * Add a role to the available roles.
-     * @param string $role
+     * Add a required permission to access to this controller.
+     * @param string $permission
      */
-    public function addAllowedRole($role) {
-        $this->roles[] = $role;
+    public function addPermission($permission) {
+        $this->permissions[] = $permission;
     }
 
     /**
-     * Check if a the role is in the controller available accesing roles.
-     * @param type $role
+     * Test if the user has the required permissions to access.
+     * @param type $user
      * @return boolean
      */
-    public function canAccess($role) {
+    public function canAccess($user) {
         $can = false;
-        foreach ($this->roles as $activeRole) {
-            if ($activeRole == $role) {
-                $can = true;
-                break;
+        foreach ($user["roles"] as $userRole) {
+            foreach ($userRole["permissions"] as $permission) {
+                if (in_array($permission, $this->permissions)) {
+                    $can = true;
+                    break;
+                }
             }
         }
         return $can;
-    }
-
-    /**
-     * Retorna la representacion json del objecto recibido por parametro.
-     * @param type $object
-     * @return json json. 
-     */
-    public function toJson($object) {
-        $array = $this->toArray($object);
-        return str_replace('\\u0000', "", json_encode($array));
-    }
-
-    /**
-     * Convierte un objeto a notacion json.
-     * @param type $obj
-     * @return type 
-     */
-    private function toArray($obj) {
-        $arr = array();
-
-        if (is_array($obj)) {
-            foreach ($obj as $value) {
-                $arr[] = $this->toArray($value);
-            }
-        }
-        if (is_object($obj)) {
-            $ardef = array();
-            $arObj = (array) $obj;
-            foreach ($arObj as $key => $value) {
-                $attribute = str_replace(get_class($obj), "", $key);
-                if (is_object($value) || is_array($value)) {
-                    $value = $this->toArray($value);
-                }
-                $arr[$attribute] = $value;
-            }
-        }
-        return $arr;
-    }
-
-    public function getRoles() {
-        return $this->roles;
-    }
-
-    public function setRoles($roles) {
-        $this->roles = $roles;
     }
 
     public function getModule() {
