@@ -36,7 +36,9 @@ class Enlace {
      * @param type $requestedUrl
      */
     public function handleRequest($requestedUrl) {
-
+        if ($this->getMode() != self::$MODE_TESTING) {
+            session_start();
+        }
         $controllersToScan = self::$config["scanneableControllers"];
         $request = HttpRequestBuilder::buildFromRequestUrl($requestedUrl);
 
@@ -73,7 +75,7 @@ class Enlace {
             } else {
 
                 // authenticated
-                if (!$controller->canAccess($_SESSION['user']['role'])) {
+                if (!$controller->canAccess($_SESSION['user'])) {
                     $request = new HttpRequest("");
                     $request->setAction($this->getRestrictedMethod());
                     $request->setControllerName("user");
