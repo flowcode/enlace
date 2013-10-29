@@ -27,7 +27,7 @@ class HttpRequestBuilder {
             if ($routedController != NULL) {
                 $controllerName = $routedController;
             }
-        }
+        } 
         $instance->setControllerName($controllerName);
 
 
@@ -43,8 +43,12 @@ class HttpRequestBuilder {
                 $actionName = $actions["*"];
             }
         } else {
-
-            $actions = Enlace::getRoute(strtolower($controllerName), "actions");
+            if (!empty($array[1])) {
+                $actionsRoute = $array[1];
+            } else {
+                $actionsRoute = "homepage";
+            }
+            $actions = Enlace::getRoute(strtolower($actionsRoute), "actions");
             if ($actions != NULL) {
                 $actionName = (isset($actions["default"])) ? $actions["default"] : "index";
             }
