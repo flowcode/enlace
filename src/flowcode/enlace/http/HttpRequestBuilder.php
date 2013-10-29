@@ -17,7 +17,9 @@ class HttpRequestBuilder {
 
         $array = explode('/', $requestedUrl);
         // controller
-        $controllerName = "home";
+
+        $homepageController = Enlace::getRoute(strtolower("homepage"), "controller");
+        $controllerName = (is_null($homepageController) ? "home" : $homepageController);
         if (!empty($array[1])) {
             $controllerName = $array[1];
             // primero intento buscar una ruta definida
@@ -34,7 +36,7 @@ class HttpRequestBuilder {
         if (!empty($array[2])) {
             $actionName = $array[2];
             // primero intento buscar una ruta definida
-            $actions = Enlace::getRoute(strtolower($array[1]), "actions");
+            $actions = Enlace::getRoute(strtolower($controllerName), "actions");
             if ($actions != NULL && isset($actions[$actionName])) {
                 $actionName = $actions[$actionName];
             } elseif (isset($actions["*"])) {
@@ -42,11 +44,9 @@ class HttpRequestBuilder {
             }
         } else {
 
-            if (isset($array[1])) {
-                $actions = Enlace::getRoute(strtolower($array[1]), "actions");
-                if ($actions != NULL) {
-                    $actionName = (isset($actions["default"])) ? $actions["default"] : "index";
-                }
+            $actions = Enlace::getRoute(strtolower($controllerName), "actions");
+            if ($actions != NULL) {
+                $actionName = (isset($actions["default"])) ? $actions["default"] : "index";
             }
         }
         $instance->setAction($actionName);
