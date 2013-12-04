@@ -20,6 +20,7 @@ class View implements IView {
     function __construct($viewData, $viewName = NULL, $viewLayout = "hierarchy") {
         $this->viewName = $viewName;
         $this->viewData = $viewData;
+        $this->viewLayout = $viewLayout;
     }
 
     public function render() {
