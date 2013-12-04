@@ -15,8 +15,9 @@ class View implements IView {
 
     protected $viewData;
     protected $viewName;
+    protected $viewLayout;
 
-    function __construct($viewData, $viewName = NULL) {
+    function __construct($viewData, $viewName = NULL, $viewLayout = "hierarchy") {
         $this->viewName = $viewName;
         $this->viewData = $viewData;
     }
@@ -41,10 +42,12 @@ class View implements IView {
         }
 
         /* default master */
-        $hierarchy = explode("/", $this->getViewName());
-        $layouts = $viewConfig["layout"];
-        if (!is_null($layouts[$hierarchy[0]])) {
-            $settedLayout = $layouts[$hierarchy[0]];
+        if ($this->viewLayout != false) {
+            $hierarchy = explode("/", $this->getViewName());
+            $layouts = $viewConfig["layout"];
+            if (!is_null($layouts[$hierarchy[0]])) {
+                $settedLayout = $layouts[$hierarchy[0]];
+            }
         }
 
         if (!is_null($settedLayout)) {
