@@ -7,7 +7,7 @@ namespace flowcode\enlace\view;
  *
  * @author juanma
  */
-class PlainView implements IView {
+class JsonView implements IView {
 
     protected $viewData;
 
@@ -16,8 +16,8 @@ class PlainView implements IView {
     }
 
     public function render() {
-
-        echo $this->viewData["data"];
+        header('Content-type: application/json');
+        echo $this->toJson($this->viewData["data"]);
     }
 
     /**
@@ -53,6 +53,8 @@ class PlainView implements IView {
                 }
                 $arr[$attribute] = $value;
             }
+        }else{
+            $arr = $obj;
         }
         return $arr;
     }
