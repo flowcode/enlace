@@ -53,10 +53,21 @@ class JsonView implements IView {
                 }
                 $arr[$attribute] = $value;
             }
-        }else{
-            $arr = $obj;
+        } else {
+            $arr = $this->utf8_encode_all($obj);
         }
         return $arr;
+    }
+
+    private function utf8_encode_all($dat) { 
+        if (is_string($dat))
+            return utf8_encode($dat);
+        if (!is_array($dat))
+            return $dat;
+        $ret = array();
+        foreach ($dat as $i => $d)
+            $ret[$i] = $this->utf8_encode_all($d);
+        return $ret;
     }
 
 }
