@@ -46,13 +46,19 @@ class EnlaceTest extends \PHPUnit_Framework_TestCase {
         $this->object->handleRequest($requestedUrl);
         $this->expectOutputString('Default controller, default method. We strongly recommend to setup your own default controller.');
     }
-    
+
     /**
      * @covers flowcode\enlace\Enlace::handleRequest
      * 
      */
     public function testHandleRequest_defaultControllerDefaultMethod_testOk() {
         $requestedUrl = "/home";
+        $this->object->handleRequest($requestedUrl);
+        $this->expectOutputString('Default controller, default method. We strongly recommend to setup your own default controller.');
+    }
+
+    public function testHandleRequest_manageParameters_ok() {
+        $requestedUrl = "/home?id=1";
         $this->object->handleRequest($requestedUrl);
         $this->expectOutputString('Default controller, default method. We strongly recommend to setup your own default controller.');
     }

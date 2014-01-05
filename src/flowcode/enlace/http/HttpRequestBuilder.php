@@ -11,13 +11,36 @@ use flowcode\enlace\Enlace;
  */
 class HttpRequestBuilder {
 
+    /**
+     * Build a HttpRequest instance.
+     * @param type $requestedUrl
+     * @return HttpRequest
+     */
     public static function buildFromRequestUrl($requestedUrl) {
         $instance = new HttpRequest();
         $instance->setRequestedUrl($requestedUrl);
 
-        $array = explode('/', $requestedUrl);
-        // controller
+        $params = array();
 
+        $arrayParam = explode('?', $requestedUrl);
+        print_r($arrayParam);
+        if (count($arrayParam) > 1) {
+            $array = explode('/', $arrayParam[0]);
+
+            /* params parse */
+//            $getVars = explode('&', $arrayParam[1]);
+//            echo $arrayParam[1] . "\n";
+//            foreach ($getVars as $keyValParam) {
+//                echo $keyValParam . "\n";
+//                $pair = explode('=', $keyValParam);
+//                $params[$pair[0]] = $pair[1];
+//                print_r($params);
+//            }
+        } else {
+            $array = explode('/', $requestedUrl);
+        }
+
+        /* controller */
         $homepageController = Enlace::getRoute(strtolower("homepage"), "controller");
         $controllerName = (is_null($homepageController) ? "home" : $homepageController);
         if (!empty($array[1])) {
@@ -27,11 +50,11 @@ class HttpRequestBuilder {
             if ($routedController != NULL) {
                 $controllerName = $routedController;
             }
-        } 
+        }
         $instance->setControllerName($controllerName);
 
 
-        // action
+        /* action */
         $actionName = "index";
         if (!empty($array[2])) {
             $actionName = $array[2];
@@ -55,10 +78,11 @@ class HttpRequestBuilder {
         }
         $instance->setAction($actionName);
 
-        $params = array();
+
         foreach ($array as $key => $value) {
-            if ($key > 2)
+            if ($key > 2) {
                 $params[] = $value;
+            }
         }
 
         $instance->setParams($params);
