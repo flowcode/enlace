@@ -23,19 +23,8 @@ class HttpRequestBuilder {
         $params = array();
 
         $arrayParam = explode('?', $requestedUrl);
-        print_r($arrayParam);
         if (count($arrayParam) > 1) {
             $array = explode('/', $arrayParam[0]);
-
-            /* params parse */
-//            $getVars = explode('&', $arrayParam[1]);
-//            echo $arrayParam[1] . "\n";
-//            foreach ($getVars as $keyValParam) {
-//                echo $keyValParam . "\n";
-//                $pair = explode('=', $keyValParam);
-//                $params[$pair[0]] = $pair[1];
-//                print_r($params);
-//            }
         } else {
             $array = explode('/', $requestedUrl);
         }
