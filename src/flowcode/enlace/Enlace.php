@@ -77,9 +77,9 @@ class Enlace {
                 // authenticated
                 if (!$controller->canAccess($_SESSION['user'])) {
                     $request = new HttpRequest("");
-                    $request->setAction($this->getRestrictedMethod());
+                    $request->setAction(self::get("restrictedMethod"));
                     $request->setControllerName("user");
-                    $class = $this->getLoginController();
+                    $class = self::get("defaultController");
                     $controller = new $class();
                 }
             }
