@@ -7,6 +7,7 @@ namespace flowcode\enlace\http;
  */
 class HttpRequest {
 
+    private $lang;
     private $requestedUrl;
     private $controller;
     private $action;
@@ -15,8 +16,8 @@ class HttpRequest {
     public function __construct() {
         $this->params = array();
     }
-    
-    public function setRequestedUrl($requestedUrl){
+
+    public function setRequestedUrl($requestedUrl) {
         $this->requestedUrl = $requestedUrl;
     }
 
@@ -28,11 +29,10 @@ class HttpRequest {
         return $this->controller;
     }
 
-
     public function setControllerName($controllerName) {
         $this->controller = $controllerName;
     }
-    
+
     public function getAction() {
         return $this->action;
     }
@@ -88,6 +88,14 @@ class HttpRequest {
 
     public function getRequestedUrl() {
         return $this->requestedUrl;
+    }
+
+    public function getLang() {
+        return $this->lang;
+    }
+
+    public function setLang($lang) {
+        $this->lang = $lang;
     }
 
 }

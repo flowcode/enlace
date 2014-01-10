@@ -29,13 +29,25 @@ class HttpRequestBuilder {
             $array = explode('/', $requestedUrl);
         }
 
+        /* i18n */
+        $baseIndex = 0;
+        if (isset($array[1]) && !is_null(Enlace::get("available-lang"))) {
+            foreach (Enlace::get("available-lang") as $lang) {
+                if ($array[1] == $lang) {
+                    $instance->setLang($array[1]);
+                    $baseIndex = 1;
+                    break;
+                }
+            }
+        }
+
         /* controller */
         $homepageController = Enlace::getRoute(strtolower("homepage"), "controller");
         $controllerName = (is_null($homepageController) ? "home" : $homepageController);
-        if (!empty($array[1])) {
-            $controllerName = $array[1];
+        if (!empty($array[$baseIndex + 1])) {
+            $controllerName = $array[$baseIndex + 1];
             // primero intento buscar una ruta definida
-            $routedController = Enlace::getRoute(strtolower($array[1]), "controller");
+            $routedController = Enlace::getRoute(strtolower($array[$baseIndex + 1]), "controller");
             if ($routedController != NULL) {
                 $controllerName = $routedController;
             }
@@ -45,8 +57,8 @@ class HttpRequestBuilder {
 
         /* action */
         $actionName = "index";
-        if (!empty($array[2])) {
-            $actionName = $array[2];
+        if (!empty($array[$baseIndex + 2])) {
+            $actionName = $array[$baseIndex + 2];
             // primero intento buscar una ruta definida
             $actions = Enlace::getRoute(strtolower($controllerName), "actions");
             if ($actions != NULL && isset($actions[$actionName])) {
@@ -55,8 +67,8 @@ class HttpRequestBuilder {
                 $actionName = $actions["*"];
             }
         } else {
-            if (!empty($array[1])) {
-                $actionsRoute = $array[1];
+            if (!empty($array[$baseIndex + 1])) {
+                $actionsRoute = $array[$baseIndex + 1];
             } else {
                 $actionsRoute = "homepage";
             }
@@ -69,7 +81,7 @@ class HttpRequestBuilder {
 
 
         foreach ($array as $key => $value) {
-            if ($key > 2) {
+            if ($key > ($baseIndex + 2)) {
                 $params[] = $value;
             }
         }
