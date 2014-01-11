@@ -36,11 +36,14 @@ class Enlace {
      * @param type $requestedUrl
      */
     public function handleRequest($requestedUrl) {
-        if ($this->getMode() != self::$MODE_TESTING) {
-            session_start();
-        }
         $controllersToScan = self::$config["scanneableControllers"];
         $request = HttpRequestBuilder::buildFromRequestUrl($requestedUrl);
+
+        /* check mode */
+        if ($this->getMode() != self::$MODE_TESTING) {
+            session_start();
+            $_SESSION["lang"] = $request->getLang();
+        }
 
         // scan controller
         $enabledController = FALSE;
