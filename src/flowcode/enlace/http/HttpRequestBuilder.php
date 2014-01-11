@@ -31,8 +31,8 @@ class HttpRequestBuilder {
 
         /* i18n */
         $baseIndex = 0;
-        if (isset($array[1]) && !is_null(Enlace::get("available-lang"))) {
-            foreach (Enlace::get("available-lang") as $lang) {
+        if (isset($array[1]) && !is_null(Enlace::get("lang","available"))) {
+            foreach (Enlace::get("lang","available") as $lang) {
                 if ($array[1] == $lang) {
                     $instance->setLang($array[1]);
                     $baseIndex = 1;

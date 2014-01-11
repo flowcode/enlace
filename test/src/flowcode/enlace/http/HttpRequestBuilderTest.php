@@ -41,7 +41,7 @@ class HttpRequestBuilderTest extends \PHPUnit_Framework_TestCase {
      * @covers flowcode\enlace\http\HttpRequestBuilder::buildFromRequestUrl
      */
     public function testBuildFromRequestUrl_defaultControllerLangES_ok() {
-        \flowcode\enlace\Enlace::set("available-lang", array("es", "en"));
+        \flowcode\enlace\Enlace::set("lang", array("available" => array("es", "en")));
         $requestedUrl = "/es/home";
         $httpRequest = HttpRequestBuilder::buildFromRequestUrl($requestedUrl);
         $this->assertEquals("home", $httpRequest->getControllerName());
