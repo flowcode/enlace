@@ -42,7 +42,9 @@ class Enlace {
         /* check mode */
         if ($this->getMode() != self::$MODE_TESTING) {
             session_start();
-            $_SESSION["lang"] = $request->getLang();
+            if (!is_null($request->getLang())) {
+                $_SESSION["lang"] = $request->getLang();
+            }
         }
 
         // scan controller
