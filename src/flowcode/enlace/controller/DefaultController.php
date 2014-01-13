@@ -10,12 +10,10 @@ use flowcode\enlace\view\PlainView;
  *
  * @author juanma
  */
-class DefaultController extends BaseController{
+class DefaultController extends BaseController {
 
     function __construct() {
         $this->setIsSecure(false);
-        $this->setName("defaultController");
-        $this->setModule("wing");
     }
 
     public function defaultMethod(HttpRequest $httpRequest) {

@@ -29,18 +29,11 @@ class DefaultControllerTest extends \PHPUnit_Framework_TestCase {
     }
 
     /**
-     * @covers flowcode\enlace\controller\DefaultController::__construct
-     */
-    public function testConstructor_testDefaultSetup_testOk() {
-        $this->assertEquals("defaultController", $this->object->getName());
-        $this->assertEquals("wing", $this->object->getModule());
-    }
-
-    /**
      * @covers flowcode\enlace\controller\DefaultController::defaultMethod
      */
     public function testDefaultMethod_testSecureTrue_testOk() {
-        $view = $this->object->defaultMethod();
+        $httpRequest = new \flowcode\enlace\http\HttpRequest();
+        $view = $this->object->defaultMethod($httpRequest);
         $view->render();
         $this->expectOutputString('Default controller, default method. We strongly recommend to setup your own default controller.');
     }

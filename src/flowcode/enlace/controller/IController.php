@@ -19,7 +19,7 @@ interface IController {
      * @param type $role
      * @return boolean
      */
-    public function canAccess($role);
+    public function canAccess(array $user);
 }
 
 ?>
