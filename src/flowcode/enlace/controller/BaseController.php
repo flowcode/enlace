@@ -53,7 +53,7 @@ class BaseController implements IController {
      * @param type $user
      * @return boolean
      */
-    public function canAccess($user) {
+    public function canAccess(array $user) {
         $can = false;
         foreach ($user["roles"] as $userRole) {
             foreach ($userRole["permissions"] as $permission) {

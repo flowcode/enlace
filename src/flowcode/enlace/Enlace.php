@@ -5,6 +5,7 @@ namespace flowcode\enlace;
 use flowcode\enlace\controller\IController;
 use flowcode\enlace\http\HttpRequest;
 use flowcode\enlace\http\HttpRequestBuilder;
+use flowcode\enlace\http\Session;
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
 
@@ -41,9 +42,17 @@ class Enlace {
 
         /* check mode */
         if ($this->getMode() != self::$MODE_TESTING) {
-            session_start();
+
+            /* session start when not testing */
+            Session::start();
+
+            /* lang config */
             if (!is_null($request->getLang())) {
-                $_SESSION["lang"] = $request->getLang();
+                Session::set("lang", $request->getLang());
+            } else {
+                if (!is_null(self::get("lang", "default"))) {
+                    Session::set("lang", self::get("lang", "default"));
+                }
             }
         }
 
@@ -67,20 +76,21 @@ class Enlace {
             $controller = new $class();
         }
 
-        // controller security
+        /* controller security */
         if ($controller->isSecure()) {
 
-            if (!isset($_SESSION['user']['username'])) {
+            /* check authenticated */
+            if (is_null(Session::get("user"))) {
 
-                // not authenticated
+                /* route to login screen */
                 $request = new HttpRequest("");
                 $request->setAction(self::get("loginMethod"));
                 $class = self::get("loginController");
                 $controller = new $class();
             } else {
 
-                // authenticated
-                if (!$controller->canAccess($_SESSION['user'])) {
+                /* check permissions */
+                if (!$controller->canAccess(Session::get("user"))) {
                     $request = new HttpRequest("");
                     $request->setAction(self::get("restrictedMethod"));
                     $request->setControllerName("user");
