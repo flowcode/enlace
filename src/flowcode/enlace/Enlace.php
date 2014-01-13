@@ -50,7 +50,7 @@ class Enlace {
             if (!is_null($request->getLang())) {
                 Session::set("lang", $request->getLang());
             } else {
-                if (!is_null(self::get("lang", "default"))) {
+                if (is_null(Session::get("lang")) && !is_null(self::get("lang", "default"))) {
                     Session::set("lang", self::get("lang", "default"));
                 }
             }
