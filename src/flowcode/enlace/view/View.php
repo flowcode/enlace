@@ -17,7 +17,7 @@ class View implements IView {
     protected $viewName;
     protected $viewLayout;
 
-    function __construct($viewData, $viewName = NULL, $viewLayout = "hierarchy") {
+    function __construct($viewData, $viewName, $viewLayout = "hierarchy") {
         $this->viewName = $viewName;
         $this->viewData = $viewData;
         $this->viewLayout = $viewLayout;
@@ -31,35 +31,58 @@ class View implements IView {
         /* set view data available */
         $viewData = $this->viewData;
 
-        /* with master */
-        $viewfile = $viewRootPath . "/" . $this->getViewName() . ".view.php";
-        if (file_exists($viewfile)) {
-            ob_start();
-            require_once $viewfile;
-            $content = ob_get_contents();
-            ob_end_clean();
-        } else {
-            throw new ViewException($viewfile);
-        }
-
-        /* default master */
         if ($this->viewLayout != false) {
-            $hierarchy = explode("/", $this->getViewName());
-            $layouts = $viewConfig["layout"];
-            if (!is_null($layouts[$hierarchy[0]])) {
-                $settedLayout = $layouts[$hierarchy[0]];
-            }
-        }
 
-        if (!is_null($settedLayout)) {
-            $layoutFile = $viewRootPath . "/" . $hierarchy[0] . "/" . $settedLayout . ".view.php";
-            if (file_exists($layoutFile)) {
-                require_once $layoutFile;
+            $hierarchy = explode("/", $this->getViewName());
+            $levelsCount = count($hierarchy) - 2;
+
+            /* include view */
+            $viewfile = $viewRootPath . "/" . $this->getViewName() . ".view.php";
+            if (file_exists($viewfile)) {
+                ob_start();
+                require $viewfile;
+                $content[$hierarchy[$levelsCount]] = ob_get_contents();
+                ob_end_clean();
             } else {
-                throw new ViewException($settedLayout);
+                throw new ViewException($viewfile);
+            }
+
+            /* hierarchy include layouts */
+            for ($level = $levelsCount; $level >= 0; $level--) {
+                $layoutName = $hierarchy[$level];
+                if ($level > 0) {
+                    /* if not root level */
+                    $viewfile = $viewRootPath;
+                    for ($m = 0; $m <= $level; $m++) {
+                        $viewfile .= "/" . $hierarchy[$m];
+                    }
+                    $viewfile .= "/" . $layoutName . ".view.php";
+                    if (file_exists($viewfile)) {
+                        ob_start();
+                        require $viewfile;
+                        $content[$hierarchy[$level - 1]] = ob_get_contents();
+                        ob_end_clean();
+                    } else {
+                        throw new ViewException($viewfile);
+                    }
+                } else {
+                    /* root layout */
+                    $layoutFile = $viewRootPath . "/" . $layoutName . "/" . $layoutName . ".view.php";
+                    if (file_exists($layoutFile)) {
+                        require $layoutFile;
+                    } else {
+                        throw new ViewException($layoutName);
+                    }
+                }
             }
         } else {
-            echo $content;
+            /* without master */
+            $viewfile = $viewRootPath . "/" . $this->getViewName() . ".view.php";
+            if (file_exists($viewfile)) {
+                require $viewfile;
+            } else {
+                throw new ViewException($viewfile);
+            }
         }
     }
 
