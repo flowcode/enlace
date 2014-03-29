@@ -1,0 +1,1 @@
+<?php echo $content["layout-root-other"] . "|layout-root-other"?>

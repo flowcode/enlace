@@ -62,8 +62,8 @@ class View implements IView {
                         require $viewfile;
                         $content[$hierarchy[$level - 1]] = ob_get_contents();
                         ob_end_clean();
-                    } else {
-                        throw new ViewException($viewfile);
+                    }else{
+                        $content[$hierarchy[$level - 1]] = $content[$hierarchy[$level]];
                     }
                 } else {
                     /* root layout */

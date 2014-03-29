@@ -66,5 +66,16 @@ class ViewTest extends \PHPUnit_Framework_TestCase {
         $aa = new View($viewData, $viewName);
         $aa->render();
     }
+    
+    /**
+     * @covers flowcode\enlace\view\View::render
+     */
+    public function testRender_oneLevelLayoutNotHierarchy_testOk() {
+        $this->expectOutputString("sectionview|layout-root-other");
+        $viewData["data"] = "sectionview";
+        $viewName = "layout-root-other/layout-one/section";
+        $aa = new View($viewData, $viewName);
+        $aa->render();
+    }
 
 }
