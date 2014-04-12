@@ -1,4 +1,5 @@
 language: php
 php:
   - "5.3"
-script: "composer install phpunit --configuration 'test/phpunit.xml' test/"
+install: "composer install"
+script: "phpunit --configuration 'test/phpunit.xml' test/"
