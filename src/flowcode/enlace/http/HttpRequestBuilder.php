@@ -20,73 +20,63 @@ class HttpRequestBuilder {
         $instance = new HttpRequest();
         $instance->setRequestedUrl($requestedUrl);
 
-        $params = array();
-
+        /* strip get parameters */
         $arrayParam = explode('?', $requestedUrl);
         if (count($arrayParam) > 1) {
-            $array = explode('/', $arrayParam[0]);
+            $explodedUrl = explode('/', $arrayParam[0]);
         } else {
-            $array = explode('/', $requestedUrl);
+            $explodedUrl = explode('/', $requestedUrl);
         }
 
         /* i18n */
         $baseIndex = 0;
-        if (isset($array[1]) && !is_null(Enlace::get("lang","available"))) {
-            foreach (Enlace::get("lang","available") as $lang => $desc) {
-                if ($array[1] == $lang) {
-                    $instance->setLang($array[1]);
+        if (isset($explodedUrl[1]) && !is_null(Enlace::get("lang", "available"))) {
+            foreach (Enlace::get("lang", "available") as $lang => $desc) {
+                if ($explodedUrl[1] == $lang) {
+                    $instance->setLang($explodedUrl[1]);
                     $baseIndex = 1;
                     break;
                 }
             }
         }
 
-        /* controller */
-        $homepageController = Enlace::getRoute(strtolower("homepage"), "controller");
-        $controllerName = (is_null($homepageController) ? "home" : $homepageController);
-        if (!empty($array[$baseIndex + 1])) {
-            $controllerName = $array[$baseIndex + 1];
-            // primero intento buscar una ruta definida
-            $routedController = Enlace::getRoute(strtolower($array[$baseIndex + 1]), "controller");
-            if ($routedController != NULL) {
-                $controllerName = $routedController;
-            }
-        }
-        $instance->setControllerName($controllerName);
+        /* look for registered routes */
+        $registeredRoutes = Enlace::getRoutes();
+        $route = null;
+        $parameters = array();
+        foreach ($registeredRoutes as $pattern => $foundRouteVal) {
+            /* pattern to regex */
+            $filterSlashes = preg_replace("/\//i", '\/', preg_replace("/:[^\/]*/i", '.*', $pattern));
+            $regex = "/" . $filterSlashes . "/";
+            if (preg_match($regex, $requestedUrl)) {
+                if (isset($foundRouteVal["method"]) && strtolower($_SERVER['REQUEST_METHOD']) != strtolower($foundRouteVal["method"])) {
+                    continue;
+                }
 
-
-        /* action */
-        $actionName = "index";
-        if (!empty($array[$baseIndex + 2])) {
-            $actionName = $array[$baseIndex + 2];
-            // primero intento buscar una ruta definida
-            $actions = Enlace::getRoute(strtolower($controllerName), "actions");
-            if ($actions != NULL && isset($actions[$actionName])) {
-                $actionName = $actions[$actionName];
-            } elseif (isset($actions["*"])) {
-                $actionName = $actions["*"];
-            }
-        } else {
-            if (!empty($array[$baseIndex + 1])) {
-                $actionsRoute = $array[$baseIndex + 1];
-            } else {
-                $actionsRoute = "homepage";
-            }
-            $actions = Enlace::getRoute(strtolower($actionsRoute), "actions");
-            if ($actions != NULL) {
-                $actionName = (isset($actions["default"])) ? $actions["default"] : "index";
-            }
-        }
-        $instance->setAction($actionName);
-
-
-        foreach ($array as $key => $value) {
-            if ($key > ($baseIndex + 2)) {
-                $params[] = $value;
+                /* fill parameters */
+                $params = preg_grep("/:\b/", explode("/", $pattern));
+                $explodedPattern = explode("/", $pattern);
+                for ($pos = 0; $pos < count($explodedPattern); $pos++) {
+                    if (in_array($explodedPattern[$pos], $params)) {
+                        $paramId = str_replace(":", "", $explodedPattern[$pos]);
+                        $parameters[$paramId] = $explodedUrl[$pos + $baseIndex];
+                    }
+                }
+                /* set values */
+                $instance->setParams($parameters);
+                $route = $foundRouteVal;
+                break;
             }
         }
 
-        $instance->setParams($params);
+        if (!is_null($route)) {
+            if (isset($route["controller"])) {
+                $instance->setControllerName($route["controller"]);
+            }
+            if (isset($route["action"])) {
+                $instance->setAction($route["action"]);
+            }
+        }
 
         return $instance;
     }

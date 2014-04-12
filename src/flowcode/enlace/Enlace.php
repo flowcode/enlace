@@ -151,16 +151,39 @@ class Enlace {
         return file_exists($filename);
     }
 
-    public static function setRoute($key, $val) {
-        self::$routes[$key] = $val;
+    /**
+     * Add a route pattern.
+     * @param type $key
+     * @param type $val
+     */
+    public static function setRoute($pattern, $val) {
+        self::$routes[$pattern] = $val;
     }
 
-    public static function getRoute($key, $param) {
-        if (isset(self::$routes[$key][$param])) {
-            return self::$routes[$key][$param];
-        } else {
-            return NULL;
+    /**
+     * Get a route.
+     * @param string $pattern.
+     * @return array route.
+     */
+    public static function getRoute($pattern) {
+        $route = null;
+        if (isset(self::$routes[$pattern])) {
+            $route = self::$routes[$pattern];
         }
+        return $route;
+    }
+    
+    public static function flush(){
+        self::$config = array();
+        self::$routes = array();
+    }
+
+    /**
+     * Get all registered routes.
+     * @return array routes.
+     */
+    public static function getRoutes() {
+        return self::$routes;
     }
 
     public static function set($key, $val) {

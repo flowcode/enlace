@@ -25,13 +25,17 @@ class HttpRequestBuilderTest extends \PHPUnit_Framework_TestCase {
      * This method is called after a test is executed.
      */
     protected function tearDown() {
-        
+        \flowcode\enlace\Enlace::flush();
     }
 
     /**
      * @covers flowcode\enlace\http\HttpRequestBuilder::buildFromRequestUrl
      */
     public function testBuildFromRequestUrl_defaultController_ok() {
+        \flowcode\enlace\Enlace::setRoute("/:resource", array(
+            "controller" => "home",
+            "action" => "index"
+        ));
         $requestedUrl = "/home";
         $httpRequest = HttpRequestBuilder::buildFromRequestUrl($requestedUrl);
         $this->assertEquals("home", $httpRequest->getControllerName());
@@ -41,30 +45,82 @@ class HttpRequestBuilderTest extends \PHPUnit_Framework_TestCase {
      * @covers flowcode\enlace\http\HttpRequestBuilder::buildFromRequestUrl
      */
     public function testBuildFromRequestUrl_defaultControllerLangES_ok() {
+        \flowcode\enlace\Enlace::setRoute("/:resource", array(
+            "controller" => "home",
+            "action" => "index"
+        ));
         \flowcode\enlace\Enlace::set("lang", array("available" => array("es", "en")));
         $requestedUrl = "/es/home";
         $httpRequest = HttpRequestBuilder::buildFromRequestUrl($requestedUrl);
         $this->assertEquals("home", $httpRequest->getControllerName());
+        $this->assertEquals("home", $httpRequest->getParameter("resource"));
+        $this->assertEquals("es", $httpRequest->getLang());
     }
 
     /**
      * @covers flowcode\enlace\http\HttpRequestBuilder::buildFromRequestUrl
      */
     public function testBuildFromRequestUrl_withGetParams_ok() {
+        \flowcode\enlace\Enlace::setRoute("/:resource", array(
+            "controller" => "home",
+            "action" => "index"
+        ));
         $requestedUrl = "/home?id=1";
         $httpRequest = HttpRequestBuilder::buildFromRequestUrl($requestedUrl);
         $this->assertEquals("home", $httpRequest->getControllerName());
     }
 
-    /**
-     * @covers flowcode\enlace\http\HttpRequestBuilder::buildFromRequestUrl
-     */
-    public function testBuildFromRequestUrl_parseParams_ok() {
-        $requestedUrl = "/home/index/id/1/name/jorge";
+    public function testBuildFromRequestUrl_restParamsFixed_ok() {
+        $requestedUrl = "/home/1";
+        \flowcode\enlace\Enlace::setRoute("/home/:id", array(
+            "controller" => "home",
+            "action" => "default"
+        ));
         $httpRequest = HttpRequestBuilder::buildFromRequestUrl($requestedUrl);
         $this->assertEquals("home", $httpRequest->getControllerName());
         $this->assertEquals("1", $httpRequest->getParameter("id"));
-        $this->assertEquals("jorge", $httpRequest->getParameter("name"));
+    }
+
+    public function testBuildFromRequestUrl_restParams_ok() {
+        $requestedUrl = "/car/house/1";
+        \flowcode\enlace\Enlace::setRoute("/car/:resource/:id", array(
+            "controller" => "home",
+            "action" => "default"
+        ));
+        $httpRequest = HttpRequestBuilder::buildFromRequestUrl($requestedUrl);
+        $this->assertEquals("home", $httpRequest->getControllerName());
+        $this->assertEquals("1", $httpRequest->getParameter("id"));
+    }
+
+    public function testBuildFromRequestUrl_newsUrl_ok() {
+        $requestedUrl = "/news/2014/04/11/this-is-a-sample-article";
+        \flowcode\enlace\Enlace::setRoute("/news/:year/:month/:day/:permalink", array(
+            "controller" => "news",
+            "action" => "list"
+        ));
+        $httpRequest = HttpRequestBuilder::buildFromRequestUrl($requestedUrl);
+        $this->assertEquals("news", $httpRequest->getControllerName());
+        $this->assertEquals("2014", $httpRequest->getParameter("year"));
+        $this->assertEquals("04", $httpRequest->getParameter("month"));
+        $this->assertEquals("11", $httpRequest->getParameter("day"));
+        $this->assertEquals("this-is-a-sample-article", $httpRequest->getParameter("permalink"));
+    }
+
+    public function testBuildFromRequestUrl_matchOrder_ok() {
+        $requestedUrl = "/news/1";
+        /* first in order */
+        \flowcode\enlace\Enlace::setRoute("/news/:id", array(
+            "controller" => "news",
+            "action" => "findById"
+        ));
+        /* second */
+        \flowcode\enlace\Enlace::setRoute("/news/:year/:month/:day", array(
+            "controller" => "news",
+            "action" => "list"
+        ));
+        $httpRequest = HttpRequestBuilder::buildFromRequestUrl($requestedUrl);
+        $this->assertEquals("news", $httpRequest->getControllerName());
+        $this->assertEquals("findById", $httpRequest->getAction());
     }
 
 }
