@@ -71,10 +71,20 @@ class HttpRequestBuilder {
 
         if (!is_null($route)) {
             if (isset($route["controller"])) {
-                $instance->setControllerName($route["controller"]);
+                $pos = strpos($route["controller"], ":");
+                if ($pos !== false && $pos == 0) {
+                    $instance->setControllerName($instance->getParameter(substr($route["controller"],1)));
+                } else {
+                    $instance->setControllerName($route["controller"]);
+                }
             }
             if (isset($route["action"])) {
-                $instance->setAction($route["action"]);
+                $pos = strpos($route["action"], ":");
+                if ($pos !== false && $pos == 0) {
+                    $instance->setAction($instance->getParameter(substr($route["action"],1)));
+                } else {
+                    $instance->setAction($route["action"]);
+                }
             }
         }
 

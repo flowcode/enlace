@@ -92,6 +92,17 @@ class HttpRequestBuilderTest extends \PHPUnit_Framework_TestCase {
         $this->assertEquals("1", $httpRequest->getParameter("id"));
     }
 
+    public function testBuildFromRequestUrl_usingParamters_ok() {
+        $requestedUrl = "/ship/list";
+        \flowcode\enlace\Enlace::setRoute("/:controller/:method", array(
+            "controller" => ":controller",
+            "action" => ":method"
+        ));
+        $httpRequest = HttpRequestBuilder::buildFromRequestUrl($requestedUrl);
+        $this->assertEquals("ship", $httpRequest->getControllerName());
+        $this->assertEquals("list", $httpRequest->getAction());
+    }
+
     public function testBuildFromRequestUrl_newsUrl_ok() {
         $requestedUrl = "/news/2014/04/11/this-is-a-sample-article";
         \flowcode\enlace\Enlace::setRoute("/news/:year/:month/:day/:permalink", array(
