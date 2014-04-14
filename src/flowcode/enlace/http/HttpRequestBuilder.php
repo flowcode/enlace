@@ -48,7 +48,6 @@ class HttpRequestBuilder {
             /* pattern to regex */
             $filterSlashes = preg_replace("/\//i", '\/', preg_replace("/:[^\/]*/i", '.*', $pattern));
             $regex = "/" . $filterSlashes . "$/";
-            echo "\n" . $regex;
             if (preg_match($regex, $requestedUrl)) {
                 if (isset($foundRouteVal["method"]) && strtolower($_SERVER['REQUEST_METHOD']) != strtolower($foundRouteVal["method"])) {
                     continue;
