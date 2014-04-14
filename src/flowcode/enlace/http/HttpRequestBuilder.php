@@ -47,7 +47,8 @@ class HttpRequestBuilder {
         foreach ($registeredRoutes as $pattern => $foundRouteVal) {
             /* pattern to regex */
             $filterSlashes = preg_replace("/\//i", '\/', preg_replace("/:[^\/]*/i", '.*', $pattern));
-            $regex = "/" . $filterSlashes . "/";
+            $regex = "/" . $filterSlashes . "$/";
+            echo "\n" . $regex;
             if (preg_match($regex, $requestedUrl)) {
                 if (isset($foundRouteVal["method"]) && strtolower($_SERVER['REQUEST_METHOD']) != strtolower($foundRouteVal["method"])) {
                     continue;
@@ -73,7 +74,7 @@ class HttpRequestBuilder {
             if (isset($route["controller"])) {
                 $pos = strpos($route["controller"], ":");
                 if ($pos !== false && $pos == 0) {
-                    $instance->setControllerName($instance->getParameter(substr($route["controller"],1)));
+                    $instance->setControllerName($instance->getParameter(substr($route["controller"], 1)));
                 } else {
                     $instance->setControllerName($route["controller"]);
                 }
@@ -81,7 +82,7 @@ class HttpRequestBuilder {
             if (isset($route["action"])) {
                 $pos = strpos($route["action"], ":");
                 if ($pos !== false && $pos == 0) {
-                    $instance->setAction($instance->getParameter(substr($route["action"],1)));
+                    $instance->setAction($instance->getParameter(substr($route["action"], 1)));
                 } else {
                     $instance->setAction($route["action"]);
                 }
