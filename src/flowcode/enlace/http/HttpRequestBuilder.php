@@ -34,6 +34,7 @@ class HttpRequestBuilder {
             foreach (Enlace::get("lang", "available") as $lang => $desc) {
                 if ($explodedUrl[1] == $lang) {
                     $instance->setLang($explodedUrl[1]);
+                    $requestedUrl = str_replace("/" . $lang, "", $requestedUrl);
                     $baseIndex = 1;
                     break;
                 }
