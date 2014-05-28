@@ -90,7 +90,7 @@ class Enlace {
             } else {
 
                 /* check permissions */
-                if (!$controller->canAccess(Session::get("user"))) {
+                if (!$controller->canAccess(wing_user())) {
                     $request = new HttpRequest("");
                     $request->setAction(self::get("restrictedMethod"));
                     $request->setControllerName("user");

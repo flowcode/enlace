@@ -43,6 +43,7 @@ class JsonView implements IView {
                 $arr[] = $this->toArray($value);
             }
         } else if (is_object($obj)) {
+            $ardef = array();
             $arObj = (array) $obj;
             foreach ($arObj as $key => $value) {
                 $attribute = str_replace(get_class($obj), "", $key);
@@ -59,16 +60,13 @@ class JsonView implements IView {
     }
 
     private function utf8_encode_all($dat) {
-        if (is_string($dat)) {
+        if (is_string($dat))
             return utf8_encode($dat);
-        }
-        if (!is_array($dat)) {
+        if (!is_array($dat))
             return $dat;
-        }
         $ret = array();
-        foreach ($dat as $i => $d) {
+        foreach ($dat as $i => $d)
             $ret[$i] = $this->utf8_encode_all($d);
-        }
         return $ret;
     }
 

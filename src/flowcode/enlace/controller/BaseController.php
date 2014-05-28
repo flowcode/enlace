@@ -53,11 +53,11 @@ class BaseController implements IController {
      * @param type $user
      * @return boolean
      */
-    public function canAccess(array $user) {
+    public function canAccess(\flowcode\bapcore\domain\User $user) {
         $can = false;
-        foreach ($user["roles"] as $userRole) {
-            foreach ($userRole["permissions"] as $permission) {
-                if (in_array($permission, $this->permissions)) {
+        foreach ($user->getRoles() as $userRole) {
+            foreach ($userRole->getPermissions() as $permission) {
+                if (in_array($permission->getName(), $this->permissions)) {
                     $can = true;
                     break;
                 }
