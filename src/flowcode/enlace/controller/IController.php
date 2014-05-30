@@ -19,7 +19,7 @@ interface IController {
      * @param type $role
      * @return boolean
      */
-    public function canAccess(array $user);
+    public function canAccess(\flowcode\enlace\domain\UserInterface $user);
 }
 
 ?>

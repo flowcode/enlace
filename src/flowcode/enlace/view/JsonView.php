@@ -2,6 +2,10 @@
 
 namespace flowcode\enlace\view;
 
+use Symfony\Component\Serializer\Encoder\JsonEncoder;
+use Symfony\Component\Serializer\Normalizer\GetSetMethodNormalizer;
+use Symfony\Component\Serializer\Serializer;
+
 /**
  * Description of View
  *
@@ -16,8 +20,11 @@ class JsonView implements IView {
     }
 
     public function render() {
+        $encoders = array(new JsonEncoder());
+        $normalizers = array(new GetSetMethodNormalizer());
+        $serializer = new Serializer($normalizers, $encoders);
         header('Content-type: application/json');
-        echo $this->toJson($this->viewData["data"]);
+        echo $serializer->serialize($this->viewData['data'], 'json');
     }
 
     /**
