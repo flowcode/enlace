@@ -117,7 +117,7 @@ class Enlace {
             /* log error */
             $msg = $error["message"] . " in file: " . $error["file"] . " on line: " . $error["line"];
             $log = new Logger('kernel');
-            $file = self::get("dir", "log") . "/log-" . date("Ymd") . ".txt";
+            $file = self::get("dir", "log") . "/log-" . date("Ymd") . ".log";
             $log->pushHandler(new StreamHandler($file, Logger::ERROR));
             switch ($this->mode) {
                 case self::$MODE_PRODUCTION:

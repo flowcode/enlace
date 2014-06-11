@@ -17,6 +17,10 @@ class HttpRequestBuilder {
      * @return HttpRequest
      */
     public static function buildFromRequestUrl($requestedUrl) {
+        /* correct path */
+        $basePath = (is_null(Enlace::get("base_path"))?'':Enlace::get("base_path"));
+        $requestedUrl = str_replace($basePath, '', $requestedUrl);
+        
         $instance = new HttpRequest();
         $instance->setRequestedUrl($requestedUrl);
 
