@@ -13,7 +13,7 @@
 
     <testsuites>
         <testsuite name="TestBundle Test Suite">
-            <directory>./Tests</directory>
+            <directory>./test</directory>
         </testsuite>
     </testsuites>
 
